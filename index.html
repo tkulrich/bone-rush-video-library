@@ -32,17 +32,17 @@
   }
   a{ color: inherit; }
 
-  /* subtle blueprint grid overlay, per colorGridOverlayOpacity: 0.1 */
+  /* subtle blueprint grid overlay, dialed back from initial pass */
   body::before{
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 1;
-    opacity: 0.1;
+    opacity: 0.035;
     background-image:
-      repeating-linear-gradient(0deg, #fff 0 1px, transparent 1px 40px),
-      repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 40px);
+      repeating-linear-gradient(0deg, #fff 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 64px);
   }
   .site-nav, .hero, .controls, #library, .empty-state, footer, .modal-backdrop, .drawer, .scrim{
     position: relative;
@@ -379,7 +379,7 @@ const DATA = [
   {
     category: "Baserunning",
     items: [
-      { title: "Running Hard Out of Box", cue: "Hard out \\ Think double", url: "https://www.mlb.com/video/big-league-basics-first-90-feet", source: "MLB.com", type: "video" },
+      { title: "Running Hard Out of Box", cue: "Hard out \\ Think double", url: "https://www.youtube.com/watch?v=56kuxICuRf4", source: "YouTube", type: "video" },
       { title: "Single — Hard Turn", cue: "Run through \\ Find ball", url: "https://www.mlb.com/video/running-through-first-base", source: "MLB.com", type: "video" },
       { title: "Run Through First", cue: "Full speed \\ Stay foul", url: "https://www.mlb.com/video/running-through-first-base", source: "MLB.com", type: "video" },
       { title: "Round Second", cue: "Coach \\ Bag \\ Coach", url: "https://www.mlb.com/video/the-rules-of-baserunning", source: "MLB.com", type: "video" },
@@ -454,8 +454,14 @@ function getYouTubeId(url){
   return m ? m[1] : null;
 }
 function getMlbSlug(url){
+  // The MLB.com -> Streamable slug pattern holds for nearly all clips.
+  // Exclude only the specific slug confirmed broken ("Video does not exist").
+  const BROKEN_SLUGS = new Set([
+    'big-league-basics-first-90-feet'
+  ]);
   const m = url.match(/mlb\.com\/video\/([a-z0-9-]+)/i);
-  return m ? m[1] : null;
+  if(!m) return null;
+  return BROKEN_SLUGS.has(m[1]) ? null : m[1];
 }
 
 function openModal(title, youtubeId){
