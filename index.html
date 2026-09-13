@@ -285,6 +285,24 @@
 
   .empty-state{ display:none; text-align:center; padding:70px 20px; color:#666; font-size:14px; }
 
+  /* ===== MORE GOOD LINKS (static, not filtered) ===== */
+  .extra-links{ max-width: 1100px; margin: 56px auto 0; padding: 0 24px; }
+  .link-list{ margin-top: 14px; border-top: 1px solid var(--line); }
+  .link-row{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding: 16px 4px; border-bottom: 1px solid var(--line);
+    text-decoration:none; color: var(--white);
+  }
+  .link-title{
+    font-family: var(--font-base); font-weight:600; font-size:15px; letter-spacing:0.02em;
+  }
+  .link-row:hover .link-title{ color: var(--gold); }
+  .link-source{
+    font-family: var(--font-base); font-weight:700; font-size:11px; letter-spacing:0.1em;
+    text-transform:uppercase; color:#7d7d7d; white-space:nowrap;
+  }
+  .link-row:hover .link-source{ color: var(--gold); }
+
   footer{
     max-width: 1100px; margin: 70px auto 0; padding: 24px 24px 50px;
     border-top: 1px solid var(--line); color: #6b6b6b; font-size: 12.5px; text-align:center;
@@ -358,6 +376,27 @@
 <div id="library"></div>
 <div class="empty-state" id="emptyState">No matches. Try a different search or clear the filter.</div>
 
+<div class="extra-links">
+  <div class="cat-title-row">
+    <h2><span class="glitch-sm">More Good Links</span></h2>
+    <div class="cat-count">Not tied to a specific drill — worth a watch</div>
+  </div>
+  <div class="link-list">
+    <a class="link-row" href="https://www.youtube.com/watch?v=CdBMlZcYKvs" target="_blank" rel="noopener">
+      <span class="link-title">How To Hold Runners Close At Second Base</span>
+      <span class="link-source">YouTube ↗</span>
+    </a>
+    <a class="link-row" href="https://www.youtube.com/watch?v=oHYNQgCHjnI" target="_blank" rel="noopener">
+      <span class="link-title">How to Cover 2nd on a Steal</span>
+      <span class="link-source">YouTube ↗</span>
+    </a>
+    <a class="link-row" href="https://www.youtube.com/@ggc_baseball" target="_blank" rel="noopener">
+      <span class="link-title">GGC Baseball — YouTube Channel</span>
+      <span class="link-source">YouTube ↗</span>
+    </a>
+  </div>
+</div>
+
 <footer>
   Sources link out to MLB.com, YouTube, and coaching-instruction sites. YouTube clips play inline. MLB.com clips and written guides open in a new tab. Concepts built on the team's own signs and calls should still be reinforced live at practice.
 </footer>
@@ -380,7 +419,7 @@ const DATA = [
     category: "Baserunning",
     items: [
       { title: "Running Hard Out of Box", cue: "Hard out \\ Think double", url: "https://www.youtube.com/watch?v=56kuxICuRf4", source: "YouTube", type: "video" },
-      { title: "Single — Hard Turn", cue: "Run through \\ Find ball", url: "https://www.mlb.com/video/running-through-first-base", source: "MLB.com", type: "video" },
+      { title: "Single — Hard Turn", cue: "Run through \\ Find ball", url: "https://www.youtube.com/watch?v=KIbSuBwWpdU", source: "YouTube", type: "video", start: 381 },
       { title: "Run Through First", cue: "Full speed \\ Stay foul", url: "https://www.mlb.com/video/running-through-first-base", source: "MLB.com", type: "video" },
       { title: "Round Second", cue: "Coach \\ Bag \\ Coach", url: "https://www.mlb.com/video/the-rules-of-baserunning", source: "MLB.com", type: "video" },
       { title: "Stealing Jump", cue: "Read pitcher \\ First move", url: "https://www.youtube.com/watch?v=qLFm5eLARS8", source: "YouTube", type: "video" },
@@ -531,7 +570,8 @@ function render(){
       const mlbSlug = (!ytId && item.type === 'video') ? getMlbSlug(item.url) : null;
       let mediaHtml;
       if(ytId){
-        mediaHtml = `<div class="inset"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+        const startParam = item.start ? `&start=${item.start}` : '';
+        mediaHtml = `<div class="inset"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0${startParam}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
       } else if(mlbSlug){
         mediaHtml = `<div class="inset"><iframe loading="lazy" src="https://streamable.com/m/${mlbSlug}?partnerId=web_video-playback-page_video-share" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
       } else {
