@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+<title>Bone Rush Baseball — Video Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fjalla+One&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black: #000000;
+    --white: #ffffff;
+    --gold: #c9a35c;
+    --grey: #9a9a9a;
+    --line: #262626;
+    --font-header: 'Fjalla One', sans-serif;
+    --font-base: 'Barlow', sans-serif;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-base);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+  }
+  a{ color: inherit; }
+
+  /* subtle blueprint grid overlay, per colorGridOverlayOpacity: 0.1 */
+  body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.1;
+    background-image:
+      repeating-linear-gradient(0deg, #fff 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 40px);
+  }
+  .site-nav, .hero, .controls, #library, .empty-state, footer, .modal-backdrop, .drawer, .scrim{
+    position: relative;
+    z-index: 2;
+  }
+
+  /* RGB glitch / chromatic-aberration header effect — text-shadow based for crisp edges */
+  .glitch{
+    text-shadow:
+      -1.5px 0 rgba(255,43,77,0.65),
+       1.5px 0 rgba(43,232,255,0.65);
+  }
+  .glitch-sm{
+    text-shadow:
+      -1px 0 rgba(255,43,77,0.5),
+       1px 0 rgba(43,232,255,0.5);
+  }
+
+  /* ===== TOP NAV (white bar, matches bonerush.com) ===== */
+  .site-nav{
+    background: var(--white);
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .nav-btn{
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--black);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+  }
+  .nav-logo{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-header);
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: 0.1em;
+    color: var(--black);
+  }
+  .nav-logo .ring{
+    width: 16px;
+    height: 16px;
+    border: 2.5px solid var(--black);
+    border-radius: 50%;
+  }
+  .nav-icons{ display:flex; align-items:center; gap: 18px; }
+
+  /* mobile category drawer */
+  .drawer{
+    display: none;
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(320px, 84vw);
+    background: var(--white);
+    color: var(--black);
+    z-index: 40;
+    padding: 22px;
+    box-shadow: -8px 0 30px rgba(0,0,0,0.4);
+  }
+  .drawer.open{ display: block; }
+  .drawer-head{ display:flex; justify-content: space-between; align-items:center; margin-bottom: 20px; }
+  .drawer h3{ font-family: var(--font-header); font-weight:400; font-size: 14px; letter-spacing: 0.15em; margin: 18px 0 10px; color:#666; text-transform: uppercase; }
+  .drawer-cat{
+    display:block; width:100%; text-align:left; background:none; border:none;
+    font-family: var(--font-base); font-weight:600; font-size:15px; padding:10px 0;
+    border-bottom:1px solid #eee; cursor:pointer; color: var(--black);
+  }
+  .drawer-cat.active{ color: var(--gold); }
+  .scrim{ display:none; position: fixed; inset:0; background: rgba(0,0,0,0.5); z-index: 35; }
+  .scrim.open{ display:block; }
+
+  /* ===== HERO ===== */
+  .hero{ text-align: center; padding: 64px 20px 40px; }
+  .hero-eyebrow{
+    font-family: var(--font-base);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .hero h1{
+    font-family: var(--font-header);
+    font-weight: 400;
+    font-size: clamp(34px, 6.5vw, 45px);
+    letter-spacing: 0.15em;
+    line-height: 1.2;
+    margin: 0;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+  .hero p{
+    max-width: 56ch;
+    margin: 18px auto 0;
+    color: var(--grey);
+    font-size: 15px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ===== CONTROLS ===== */
+  .controls{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  #search{
+    width: 100%;
+    background: #0d0d0d;
+    border: 1px solid var(--line);
+    color: var(--white);
+    font-family: var(--font-base);
+    font-size: 15px;
+    padding: 12px 16px;
+    border-radius: 0;
+  }
+  #search:focus{ outline: none; border-color: var(--gold); }
+  #search::placeholder{ color: #6b6b6b; }
+  .chips{ display:flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .chip{
+    font-family: var(--font-base);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+    color: var(--grey);
+    cursor: pointer;
+  }
+  .chip.active{ border-color: var(--gold); color: var(--gold); }
+  .count{ text-align:center; font-size: 12px; color: #6b6b6b; }
+
+  /* ===== CATEGORY SECTIONS ===== */
+  .cat-title-row{
+    max-width: 1100px;
+    margin: 56px auto 0;
+    padding: 0 24px;
+  }
+  .cat-title-row h2{
+    font-family: var(--font-header);
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: 0.15em;
+    margin: 0 0 4px;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+  .cat-title-row .cat-count{ color: var(--gold); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* ===== GRID (mirrors product grid: edge images, dark caption) ===== */
+  .grid{
+    max-width: 1100px;
+    margin: 20px auto 0;
+    padding: 0 24px 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  .card{ display:flex; flex-direction:column; }
+  .card-media{
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    background: var(--white);
+    overflow: hidden;
+  }
+  .card-media .inset{
+    position: absolute;
+    inset: 10px;
+    background: #000;
+  }
+  .card-media iframe{
+    position:absolute; inset:0; width:100%; height:100%; border:0;
+  }
+  .placeholder-tile{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    background: #111;
+    color: #fff;
+    text-decoration:none;
+    cursor:pointer;
+  }
+  .placeholder-tile .play{
+    width: 44px; height: 44px; border-radius: 0;
+    border: 2px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--gold);
+    font-size: 16px;
+  }
+  .placeholder-tile .plabel{
+    font-family: var(--font-base); font-weight:700; font-size:11px; letter-spacing:0.12em;
+    text-transform:uppercase; color:#bbb;
+  }
+  .placeholder-tile:hover .play{ background: var(--gold); color:#000; }
+
+  .card-cap{ padding: 16px 4px 8px; text-align:center; }
+  .card-cat{
+    font-family: var(--font-base); font-weight:700; font-size: 10.5px;
+    letter-spacing: 0.15em; text-transform: uppercase; color:#6b6b6b; margin-bottom: 6px;
+  }
+  .card-title{
+    font-family: var(--font-header);
+    font-weight: 400;
+    font-size: 17px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin: 0 0 6px;
+  }
+  .card-cue{
+    font-family: var(--font-base);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    color: var(--gold);
+    margin: 0 0 4px;
+  }
+  .card-cue.empty{ color:#555; font-style:italic; font-weight:400; }
+  .card-link{
+    font-family: var(--font-base); font-weight:700; font-size:11px; letter-spacing:0.1em;
+    text-transform:uppercase; color:#7d7d7d; text-decoration:none; display:inline-block; margin-top:4px;
+  }
+  .card-link:hover{ color: var(--gold); }
+
+  .empty-state{ display:none; text-align:center; padding:70px 20px; color:#666; font-size:14px; }
+
+  footer{
+    max-width: 1100px; margin: 70px auto 0; padding: 24px 24px 50px;
+    border-top: 1px solid var(--line); color: #6b6b6b; font-size: 12.5px; text-align:center;
+  }
+
+  /* ===== VIDEO MODAL ===== */
+  .modal-backdrop{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:50;
+    align-items:center; justify-content:center; padding:24px;
+  }
+  .modal-backdrop.open{ display:flex; }
+  .modal-box{ width:100%; max-width: 900px; }
+  .modal-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .modal-title{ font-family: var(--font-base); font-weight:700; font-size:14px; letter-spacing:0.04em; color:#fff; }
+  .modal-close{
+    background:none; border:1px solid var(--gold); color: var(--gold);
+    font-family: var(--font-base); font-weight:700; font-size:12px; letter-spacing:0.06em; padding:7px 13px; cursor:pointer; border-radius:0;
+  }
+  .modal-close:hover{ background: var(--gold); color:#000; }
+  .video-frame-wrap{ position:relative; width:100%; padding-top:56.25%; background:#000; }
+  .video-frame-wrap iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+
+  @media (max-width: 860px){
+    .grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 540px){
+    .grid{ grid-template-columns: 1fr; gap: 30px; }
+    .site-nav{ padding: 16px 18px; }
+    .nav-logo{ font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <button class="nav-btn" id="menuBtn" aria-label="Open categories">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/></svg>
+  </button>
+  <div class="nav-logo">BONE<span class="ring"></span>RUSH</div>
+  <div class="nav-icons">
+    <button class="nav-btn" id="searchBtn" aria-label="Search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="nav-logo">BONE<span class="ring"></span>RUSH</div>
+    <button class="nav-btn" id="drawerClose" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/></svg>
+    </button>
+  </div>
+  <h3>Categories</h3>
+  <div id="drawerCats"></div>
+</div>
+
+<section class="hero">
+  <div class="hero-eyebrow">Bone Rush Baseball</div>
+  <h1><span class="glitch">VIDEO LIBRARY</span></h1>
+  <p>Player development film for every concept the team drills. Watch on your own time, bring it to practice.</p>
+</section>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="Search a concept or coaching cue…" autocomplete="off">
+  <div class="chips" id="chips"></div>
+  <div class="count" id="count"></div>
+</div>
+
+<div id="library"></div>
+<div class="empty-state" id="emptyState">No matches. Try a different search or clear the filter.</div>
+
+<footer>
+  Sources link out to MLB.com, YouTube, and coaching-instruction sites. YouTube clips play inline. MLB.com clips and written guides open in a new tab. Concepts built on the team's own signs and calls should still be reinforced live at practice.
+</footer>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title" id="modalTitle"></span>
+      <button class="modal-close" id="modalClose">Close ✕</button>
+    </div>
+    <div class="video-frame-wrap">
+      <iframe id="modalFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {
+    category: "Baserunning",
+    items: [
+      { title: "Running Hard Out of Box", cue: "Hard out \\ Think double", url: "https://www.mlb.com/video/big-league-basics-first-90-feet", source: "MLB.com", type: "video" },
+      { title: "Single — Hard Turn", cue: "Run through \\ Find ball", url: "https://www.mlb.com/video/running-through-first-base", source: "MLB.com", type: "video" },
+      { title: "Run Through First", cue: "Full speed \\ Stay foul", url: "https://www.mlb.com/video/running-through-first-base", source: "MLB.com", type: "video" },
+      { title: "Round Second", cue: "Coach \\ Bag \\ Coach", url: "https://www.mlb.com/video/the-rules-of-baserunning", source: "MLB.com", type: "video" },
+      { title: "Stealing Jump", cue: "Read pitcher \\ First move", url: "https://www.youtube.com/watch?v=qLFm5eLARS8", source: "YouTube", type: "video" },
+      { title: "GREEN to 3rd", cue: "Hear GREEN \\ Go", url: "https://www.mlb.com/news/phillies-using-new-drill-to-help-baserunners-c220390964", source: "MLB.com — article", type: "guide" },
+      { title: "Dead Man / Rundown", cue: "Lead in trouble \\ Go", url: "https://www.mlb.com/video/the-rundown-s-baserunning-demo", source: "MLB.com", type: "video" },
+      { title: "Bunt Down", cue: "Bunt down \\ Go", url: "https://www.youtube.com/watch?v=_idxZxjn280", source: "YouTube", type: "video" },
+      { title: "Line Drive / Tag Up", cue: "Read ball \\ Tag/go", url: "https://www.mlb.com/video/tagging-up", source: "MLB.com", type: "video" },
+      { title: "1st and 3rd Steal", cue: "Ball past pitcher = Go", url: "https://www.youtube.com/watch?v=aTMOwKdTwAc", source: "YouTube", type: "video" },
+      { title: "Delayed Steal / Dirt", cue: "Two shuffles \\ Go", url: "https://www.mlb.com/video/delayed-stealing-on-play-ball", source: "MLB.com", type: "video" }
+    ]
+  },
+  {
+    category: "Defense — Ball in Play",
+    items: [
+      { title: "Cutoffs / Tandem MI / 1B Trailer", cue: "Read sure double \\ Trail and back-pick", url: "https://www.youtube.com/watch?v=co6dZujHUwY", source: "YouTube", type: "video" },
+      { title: "Bunt Defense", cue: "Know assignment early", url: "https://inmotionplaybooks.com/videos/standard-bunt-defense-runner-on-first-base/", source: "InMotion Playbooks", type: "video" },
+      { title: "PFP — Balls in Play + Backup", cue: "5th infielder \\ Be ready to cover", url: "https://gorout.com/baseball-pfp-pitcher-fielding-practice/", source: "GoRout — guide", type: "guide" },
+      { title: "OF Ground Balls", cue: "Behind it \\ In front", url: "https://www.mlb.com/video/instructional-videos-outfield", source: "MLB.com", type: "video" },
+      { title: "Outfield Angles", cue: "First step \\ Direct route", url: "https://www.mlb.com/video/play-ball-zimmer-s-of-approach-c2161479383", source: "MLB.com", type: "video" }
+    ]
+  },
+  {
+    category: "Defense — Pre-Pitch",
+    items: [
+      { title: "2B Spin / SS Cover", cue: "Pitch \\ Assignment \\ Rotation", url: "https://www.youtube.com/watch?v=FHvAbpmHt0M", source: "YouTube", type: "video" },
+      { title: "Pickoff Signs", cue: "Know sign \\ Execute", url: "https://www.mlb.com/video/breaking-down-the-art-of-pickoff-moves", source: "MLB.com", type: "video" },
+      { title: "No Pick Following Runners", cue: "Home vs hold", url: "https://www.baseballbytheyard.com/playing-behind-the-runner-at-first-base/", source: "Baseball By The Yard — guide", type: "guide" },
+      { title: "Best Move Setup", cue: "Don't use too early, set up for the good one", url: "https://www.mlb.com/video/breaking-down-the-art-of-pickoff-moves", source: "MLB.com", type: "video" },
+      { title: "MI Holding Runner", cue: "Hold runner \\ Protect play", url: "https://probaseballinsider.com/baseball-instruction/second-base/holding-runners-on-at-second-base/", source: "Pro Baseball Insider — guide", type: "guide" },
+      { title: "1B Holding / Behind Runner", cue: "Lead runner changes spot", url: "https://www.youtube.com/watch?v=H1KGVnRGDkY", source: "YouTube", type: "video" },
+      { title: "OF Positioning", cue: "Position before pitch", url: "https://www.youtube.com/watch?v=i0koa1m1B2Q", source: "YouTube", type: "video" },
+      { title: "1st and 3rd Plays", cue: "Know options \\ Execute", url: "https://www.youtube.com/watch?v=aTMOwKdTwAc", source: "YouTube", type: "video" }
+    ]
+  },
+  {
+    category: "Hitting",
+    items: [
+      { title: "Hitter's Mentality", cue: "0 attack \\ 1 aggressive \\ 2 protect", url: "https://www.youtube.com/watch?v=O9ezspngYuI", source: "YouTube", type: "video" },
+      { title: "Two-Strike Hitting", cue: "Compete \\ Protect", url: "https://www.youtube.com/watch?v=XzaCg9kM1rs", source: "YouTube", type: "video" },
+      { title: "Stay in Box / Interference", cue: "Know box \\ Avoid catcher", url: "https://www.mlb.com/video/turner-out-on-batter-interference", source: "MLB.com", type: "video" },
+      { title: "Getting Bunts Down", cue: "Control bat \\ Ball", url: "https://www.mlb.com/video/big-league-basics-bunting", source: "MLB.com", type: "video" },
+      { title: "Fake Bunt", cue: "Show bunt \\ Be ready", url: "https://www.mlb.com/video/mlb-tonight-bunting-demo-c1255819483", source: "MLB.com", type: "video" }
+    ]
+  },
+  {
+    category: "Defense — Catching",
+    items: [
+      { title: "Blocking / Receiving / Footwork", cue: "Quiet hands \\ Good feet", url: "https://www.mlb.com/video/catching-coach-greg-brodzinski", source: "MLB.com", type: "video" },
+      { title: "Pop Ups", cue: "Find it \\ Get out", url: "https://www.mlb.com/video/joe-oliver-catching-popups", source: "MLB.com", type: "video" },
+      { title: "Talking on Cutoffs", cue: "Talk early \\ Next play", url: "https://inmotionplaybooks.com/videos/tandem-relays-2/", source: "InMotion Playbooks", type: "video" }
+    ]
+  }
+];
+
+const libraryEl = document.getElementById('library');
+const chipsEl = document.getElementById('chips');
+const drawerCatsEl = document.getElementById('drawerCats');
+const searchEl = document.getElementById('search');
+const countEl = document.getElementById('count');
+const emptyEl = document.getElementById('emptyState');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalFrame = document.getElementById('modalFrame');
+const modalTitle = document.getElementById('modalTitle');
+const modalClose = document.getElementById('modalClose');
+
+const categories = DATA.map(d => d.category);
+let activeCategory = 'All';
+
+function getYouTubeId(url){
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+  return m ? m[1] : null;
+}
+function getMlbSlug(url){
+  const m = url.match(/mlb\.com\/video\/([a-z0-9-]+)/i);
+  return m ? m[1] : null;
+}
+
+function openModal(title, youtubeId){
+  modalTitle.textContent = title;
+  modalFrame.src = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0`;
+  modalBackdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(){
+  modalBackdrop.classList.remove('open');
+  modalFrame.src = '';
+  document.body.style.overflow = '';
+}
+modalClose.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', (e)=>{ if(e.target === modalBackdrop) closeModal(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+
+libraryEl.addEventListener('click', (e) => {
+  const trigger = e.target.closest('[data-youtube-id]');
+  if(!trigger) return;
+  e.preventDefault();
+  openModal(trigger.dataset.title, trigger.dataset.youtubeId);
+});
+
+function buildChips(){
+  const all = ['All', ...categories];
+  chipsEl.innerHTML = all.map(c =>
+    `<button class="chip${c===activeCategory?' active':''}" data-cat="${c}">${c}</button>`
+  ).join('');
+  chipsEl.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ activeCategory = btn.dataset.cat; buildChips(); buildDrawer(); render(); closeDrawer(); });
+  });
+}
+
+function buildDrawer(){
+  const all = ['All', ...categories];
+  drawerCatsEl.innerHTML = all.map(c =>
+    `<button class="drawer-cat${c===activeCategory?' active':''}" data-cat="${c}">${c}</button>`
+  ).join('');
+  drawerCatsEl.querySelectorAll('.drawer-cat').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ activeCategory = btn.dataset.cat; buildChips(); buildDrawer(); render(); closeDrawer(); });
+  });
+}
+
+function render(){
+  const q = searchEl.value.trim().toLowerCase();
+  let totalShown = 0;
+  let html = '';
+
+  DATA.forEach(group => {
+    if(activeCategory !== 'All' && activeCategory !== group.category) return;
+    const filtered = group.items.filter(item=>{
+      if(!q) return true;
+      return item.title.toLowerCase().includes(q) || item.cue.toLowerCase().includes(q);
+    });
+    if(filtered.length === 0) return;
+    totalShown += filtered.length;
+
+    html += `<div class="cat-title-row">
+      <h2><span class="glitch-sm">${group.category}</span></h2>
+      <div class="cat-count">${filtered.length} video${filtered.length===1?'':'s'}</div>
+    </div>
+    <div class="grid">`;
+
+    filtered.forEach(item=>{
+      const ytId = item.type === 'video' ? getYouTubeId(item.url) : null;
+      const mlbSlug = (!ytId && item.type === 'video') ? getMlbSlug(item.url) : null;
+      let mediaHtml;
+      if(ytId){
+        mediaHtml = `<div class="inset"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+      } else if(mlbSlug){
+        mediaHtml = `<div class="inset"><iframe loading="lazy" src="https://streamable.com/m/${mlbSlug}?partnerId=web_video-playback-page_video-share" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+      } else {
+        const label = item.type === 'guide' ? 'Read Guide' : 'Watch on ' + item.source;
+        mediaHtml = `<a class="placeholder-tile" href="${item.url}" target="_blank" rel="noopener">
+          <span class="play">▸</span>
+          <span class="plabel">${label}</span>
+        </a>`;
+      }
+      html += `<div class="card">
+        <div class="card-media">${mediaHtml}</div>
+        <div class="card-cap">
+          <div class="card-cat">${group.category}</div>
+          <p class="card-title">${item.title}</p>
+          <p class="card-cue${item.cue?'':' empty'}">${item.cue || 'cue not set'}</p>
+          <a class="card-link" href="${item.url}" target="_blank" rel="noopener">${item.source} ↗</a>
+        </div>
+      </div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  libraryEl.innerHTML = html;
+  emptyEl.style.display = totalShown === 0 ? 'block' : 'none';
+  countEl.textContent = `${totalShown} of ${DATA.reduce((a,g)=>a+g.items.length,0)} concepts shown`;
+}
+
+/* nav drawer + search toggle */
+const menuBtn = document.getElementById('menuBtn');
+const drawer = document.getElementById('drawer');
+const drawerClose = document.getElementById('drawerClose');
+const scrim = document.getElementById('scrim');
+const searchBtn = document.getElementById('searchBtn');
+
+function openDrawer(){ drawer.classList.add('open'); scrim.classList.add('open'); }
+function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('open'); }
+menuBtn.addEventListener('click', openDrawer);
+drawerClose.addEventListener('click', closeDrawer);
+scrim.addEventListener('click', closeDrawer);
+searchBtn.addEventListener('click', ()=>{ searchEl.scrollIntoView({behavior:'smooth', block:'center'}); searchEl.focus(); });
+
+searchEl.addEventListener('input', render);
+buildChips();
+buildDrawer();
+render();
+</script>
+
+</body>
+</html>
