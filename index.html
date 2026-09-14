@@ -28,7 +28,12 @@
     letter-spacing: 0.05em;
     line-height: 1.4;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     position: relative;
+  }
+  h1, h2, h3, .nav-logo, .card-title{
+    -webkit-font-smoothing: subpixel-antialiased;
   }
   a{ color: inherit; }
 
@@ -52,13 +57,13 @@
   /* RGB glitch / chromatic-aberration header effect — text-shadow based for crisp edges */
   .glitch{
     text-shadow:
-      -1.5px 0 rgba(255,43,77,0.65),
-       1.5px 0 rgba(43,232,255,0.65);
+      -1px 0 rgba(255,43,77,0.45),
+       1px 0 rgba(43,232,255,0.45);
   }
   .glitch-sm{
     text-shadow:
-      -1px 0 rgba(255,43,77,0.5),
-       1px 0 rgba(43,232,255,0.5);
+      -0.6px 0 rgba(255,43,77,0.35),
+       0.6px 0 rgba(43,232,255,0.35);
   }
 
   /* ===== TOP NAV (white bar, matches bonerush.com) ===== */
@@ -413,7 +418,7 @@ const DATA = [
       { title: "Single — Hard Turn", cue: "Run through \\ Find ball", url: "https://www.youtube.com/watch?v=KIbSuBwWpdU", source: "YouTube", type: "video", start: 381 },
       { title: "Run Through First", cue: "Full speed \\ Stay foul", url: "https://www.mlb.com/video/running-through-first-base", source: "MLB.com", type: "video" },
       { title: "Round Second", cue: "Coach \\ Bag \\ Coach", url: "https://m.youtube.com/watch?v=ZUiOz3wF6jI", source: "YouTube", type: "video" },
-      { title: "Stealing Jump", cue: "Read pitcher \\ First move", url: "https://www.youtube.com/watch?v=qLFm5eLARS8", source: "YouTube", type: "video" },
+      { title: "Stealing Jump", cue: "Read pitcher \\ First move", url: "https://www.youtube.com/watch?v=ZdVx7F1z8GU", source: "YouTube", type: "video", start: 250 },
       { title: "GREEN to 3rd", cue: "Hear GREEN \\ Go", url: "https://www.mlb.com/news/phillies-using-new-drill-to-help-baserunners-c220390964", source: "MLB.com — article", type: "guide" },
       { title: "Dead Man / Rundown", cue: "Lead in trouble \\ Go", url: "https://www.mlb.com/video/the-rundown-s-baserunning-demo", source: "MLB.com", type: "video" },
       { title: "Bunt Down", cue: "Bunt down \\ Go", url: "https://www.youtube.com/watch?v=_idxZxjn280", source: "YouTube", type: "video" },
